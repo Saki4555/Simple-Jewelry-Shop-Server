@@ -1,5 +1,5 @@
 const express = require("express");
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const app = express();
 const cors = require("cors");
 require("dotenv").config();
@@ -28,6 +28,7 @@ async function run() {
     await client.connect();
     const usersCollection = client.db("jewelryDb").collection("users");
     const jewelriesCollection = client.db("jewelryDb").collection("jewelries");
+    const cartCollection = client.db("jewelryDb").collection("carts");
 
     app.put("/users/:email", async (req, res) => {
       const email = req.params.email;
@@ -58,6 +59,18 @@ async function run() {
       const result = await jewelriesCollection.insertOne(newJewelry);
       res.send(result);
     });
+
+    app.put("/cart/:id", async (req, res) => {
+        const id = req.params.id;
+        const jewelry = req.body;
+        const query = { id: id};
+        const options = { upsert: true };
+        const updateDoc = {
+          $set: jewelry,
+        };
+        const result = await cartCollection.updateOne(query, updateDoc, options);
+        res.send(result);
+      });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
