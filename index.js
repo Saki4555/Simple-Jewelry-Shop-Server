@@ -53,6 +53,15 @@ async function run() {
       const result = await jewelriesCollection.find().toArray();
       res.send(result);
     });
+
+    app.get("/jewelries/:email", async (req, res) => {
+      const email = req.params.email;
+      console.log(email);
+      const query = { sellerEmail: email };
+      const result = await jewelriesCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/jewelries", async (req, res) => {
       const newJewelry = req.body;
       console.log(newJewelry);
@@ -61,16 +70,16 @@ async function run() {
     });
 
     app.put("/cart/:id", async (req, res) => {
-        const id = req.params.id;
-        const jewelry = req.body;
-        const query = { id: id};
-        const options = { upsert: true };
-        const updateDoc = {
-          $set: jewelry,
-        };
-        const result = await cartCollection.updateOne(query, updateDoc, options);
-        res.send(result);
-      });
+      const id = req.params.id;
+      const jewelry = req.body;
+      const query = { id: id };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: jewelry,
+      };
+      const result = await cartCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
