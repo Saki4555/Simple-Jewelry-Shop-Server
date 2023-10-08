@@ -11,7 +11,6 @@ const port = process.env.PORT || 5000;
 console.log(process.env.DB_USER);
 console.log(process.env.DB_PASS);
 
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.phgiqsm.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -25,24 +24,41 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-
-     // Connect the client to the server	(optional starting in v4.7)
-     await client.connect();
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
     const usersCollection = client.db("jewelryDb").collection("users");
     const jewelriesCollection = client.db("jewelryDb").collection("jewelries");
 
+    app.put("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const query = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await usersCollection.updateOne(query, updateDoc, options);
+      res.send(result);
+    });
 
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const result = await usersCollection.findOne(query);
+      res.send(result);
+    });
 
-    app.post('/jewelries', async(req, res) => {
-        const newJewelry = req.body;
-        console.log(newJewelry);
-        const result = await jewelriesCollection.insertOne(newJewelry);
-        // console.log(newJewelry);
-        res.send(result);
-    })
+    app.get("/jewelries", async (req, res) => {
+      const result = await jewelriesCollection.find().toArray();
+      res.send(result);
+    });
+    app.post("/jewelries", async (req, res) => {
+      const newJewelry = req.body;
+      console.log(newJewelry);
+      const result = await jewelriesCollection.insertOne(newJewelry);
+      res.send(result);
+    });
 
-
-   
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
