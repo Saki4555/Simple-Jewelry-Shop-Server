@@ -56,7 +56,7 @@ async function run() {
 
     app.get("/jewelries/:email", async (req, res) => {
       const email = req.params.email;
-      console.log(email);
+
       const query = { sellerEmail: email };
       const result = await jewelriesCollection.find(query).toArray();
       res.send(result);
@@ -80,6 +80,15 @@ async function run() {
       const result = await cartCollection.updateOne(query, updateDoc, options);
       res.send(result);
     });
+
+    app.get("/cart/:email", async (req, res) => {
+        const email = req.params.email;
+  
+        const query = { customerEmail: email };
+        const result = await cartCollection.find(query).toArray();
+        res.send(result);
+      });
+  
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
