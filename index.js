@@ -8,8 +8,6 @@ app.use(express.json());
 app.use(cors());
 
 const port = process.env.PORT || 5000;
-console.log(process.env.DB_USER);
-console.log(process.env.DB_PASS);
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.phgiqsm.mongodb.net/?retryWrites=true&w=majority`;
 
